@@ -1,0 +1,10 @@
+{
+  "description": "Helps scientists and mission planners find Earth sites that resemble the Moon or Mars by comparing open space-agency data, analog characteristics, and mission needs.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

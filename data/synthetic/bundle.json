@@ -1,0 +1,120 @@
+{
+  "data_mode": "synthetic",
+  "data_version": "synthetic-0.1.0",
+  "screen_version": "1.0.0",
+  "grid_spacing_deg": 0.25,
+  "coverage_bbox": [
+    -180,
+    -78,
+    180,
+    85
+  ],
+  "windows_file": "windows.json",
+  "n_windows": 428,
+  "layers": [
+    {
+      "layer_id": "slope",
+      "kind": "distribution",
+      "unit": "degree",
+      "source_id": "dem_srtm",
+      "tier": "B",
+      "licence": "public / open (confirm exact product on data day)"
+    },
+    {
+      "layer_id": "roughness",
+      "kind": "distribution",
+      "unit": "meter",
+      "source_id": "dem_srtm",
+      "tier": "B",
+      "licence": "public / open (confirm exact product on data day)"
+    },
+    {
+      "layer_id": "temperature",
+      "kind": "envelope",
+      "unit": "celsius",
+      "source_id": "lst_climatology",
+      "tier": "B",
+      "licence": "to confirm"
+    },
+    {
+      "layer_id": "sunlit_fraction",
+      "kind": "distribution",
+      "unit": "fraction",
+      "source_id": "lola_illum",
+      "tier": "B",
+      "licence": "public (NASA PGDA)"
+    },
+    {
+      "layer_id": "sun_elevation_max",
+      "kind": "scalar",
+      "unit": "degree",
+      "source_id": "solar_geometry",
+      "tier": "B",
+      "licence": "n/a (computed)"
+    },
+    {
+      "layer_id": "permafrost_index",
+      "kind": "scalar",
+      "unit": "index_0_1",
+      "source_id": "permafrost_pzi",
+      "tier": "C",
+      "licence": "research use (confirm)"
+    },
+    {
+      "layer_id": "basaltic_volcanic_fraction",
+      "kind": "scalar",
+      "unit": "fraction",
+      "source_id": "glim_lithology",
+      "tier": "C",
+      "licence": "CC BY 3.0"
+    },
+    {
+      "layer_id": "cave_evidence",
+      "kind": "ordinal",
+      "unit": "class",
+      "source_id": "cave_catalog",
+      "tier": "C",
+      "licence": "public domain (USGS)"
+    },
+    {
+      "layer_id": "dust_aerosol_load",
+      "kind": "scalar",
+      "unit": "optical_depth",
+      "source_id": "merra2_aerosol",
+      "tier": "B",
+      "licence": "NASA open"
+    },
+    {
+      "layer_id": "wind_speed_mean",
+      "kind": "scalar",
+      "unit": "meter_per_second",
+      "source_id": "merra2_wind",
+      "tier": "B",
+      "licence": "NASA open"
+    },
+    {
+      "layer_id": "vegetation_cover",
+      "kind": "scalar",
+      "unit": "percent",
+      "source_id": "modis_vcf",
+      "tier": "C",
+      "licence": "no use restrictions"
+    },
+    {
+      "layer_id": "remoteness_time",
+      "kind": "scalar",
+      "unit": "minute",
+      "source_id": "travel_time",
+      "tier": "B",
+      "licence": "open (confirm)"
+    },
+    {
+      "layer_id": "logistics_access",
+      "kind": "setup",
+      "unit": "category",
+      "source_id": "curated",
+      "tier": "B",
+      "licence": "see citations"
+    }
+  ]
+}

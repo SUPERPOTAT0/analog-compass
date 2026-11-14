@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
+
+# Env / secrets
+.env
+.env.local
+*.key
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# Data (large / restricted) — only descriptors are tracked
+data/real/
+*.tif
+*.tiff
+*.hdf
+*.img
+
+# OS
+.DS_Store

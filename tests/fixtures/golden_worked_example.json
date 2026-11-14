@@ -1,0 +1,24 @@
+{
+  "description": "Golden worked example proving per-draw gating and the borderline verdict.",
+  "test": {
+    "test_id": "golden_slope_gate",
+    "requirements": [
+      {"characteristic": "slope", "role": "must", "kind": "distribution",
+       "weight": 1.0, "tau": 5.0, "gate": {"stat": "p50", "max": 15.0}}
+    ]
+  },
+  "target": {
+    "slope": {"kind": "distribution", "tier": "B",
+              "quantiles_control": {"0.01": -2.0, "0.5": 8.0, "0.99": 18.0}}
+  },
+  "sites": {
+    "A_pass": {"slope_p50": 8.0, "band": 0.0, "note": "identical to target slope -> match 1.0, gate passes -> pass"},
+    "B_excluded": {"slope_p50": 25.0, "band": 0.0, "note": "p50 above gate in every draw -> excluded"},
+    "C_borderline": {"slope_p50": 15.0, "band": 4.0, "note": "p50 straddles the 15 gate -> passes ~50% of draws -> borderline"}
+  },
+  "expected": {
+    "A_pass": {"verdict": "pass", "slope_match": 1.0, "score": 1.0},
+    "B_excluded": {"verdict": "excluded", "p_gate": 0.0},
+    "C_borderline": {"verdict": "borderline", "p_gate_range": [0.4, 0.6]}
+  }
+}

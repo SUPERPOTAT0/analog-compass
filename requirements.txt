@@ -1,0 +1,10 @@
+# Runtime requirements for the API (container / Vercel Python). Dev/test deps are in
+# pyproject.toml dependency-groups. Pins are minimums; lock with uv for reproducibility.
+numpy>=1.26
+pydantic>=2.6
+pydantic-settings>=2.2
+pyyaml>=6.0
+fastapi>=0.111
+uvicorn[standard]>=0.30
+anthropic>=0.40
+sse-starlette>=2.1

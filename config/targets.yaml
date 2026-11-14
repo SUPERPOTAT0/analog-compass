@@ -1,0 +1,44 @@
+# Target environments (Moon/Mars). Distribution characteristics use control-point
+# quantiles {level 0-1 : value}; the loader interpolates to 101 levels.
+# threshold-kind characteristics are NOT given here — their requirement comes from the test.
+version: "0.1.0"
+
+targets:
+  - target_id: mars_mid_latitude
+    body: mars
+    label: "Mars — mid-latitude mantled terrain"
+    characteristics:
+      temperature: {kind: envelope, envelope: [-120, 20], tier: B, source_id: lst_climatology}
+      slope:       {kind: distribution, tier: B, source_id: dem_srtm,
+                    quantiles: {0.01: 0.0, 0.5: 6.0, 0.99: 25.0}}
+      roughness:   {kind: distribution, tier: B, source_id: dem_srtm,
+                    quantiles: {0.01: 0.1, 0.5: 1.5, 0.99: 8.0}}
+      basaltic_volcanic_fraction: {kind: scalar, value: 0.5, tier: C, source_id: glim_lithology}
+      dust_aerosol_load: {kind: scalar, value: 0.4, tier: B, source_id: merra2_aerosol,
+                          note: "opacity vs Earth AOD 550nm — conversion required (OPEN-09)"}
+    facts:
+      - id: mars_obliquity
+        text: "Mars' axial obliquity is about 25 degrees, close to Earth's, giving pronounced seasons."
+        grade: verified
+        source_id: curated
+      - id: mars_dust_storms
+        text: "Mars can develop regional-to-global dust storms that raise atmospheric opacity for weeks."
+        grade: cited
+        source_id: curated
+
+  - target_id: moon_polar
+    body: moon
+    label: "Moon — polar, permanently-shadowed vicinity"
+    characteristics:
+      temperature: {kind: envelope, envelope: [-240, -50], tier: B, source_id: diviner_temp}
+      sunlit_fraction: {kind: distribution, tier: B, source_id: lola_illum,
+                        quantiles: {0.01: 0.0, 0.5: 0.2, 0.99: 0.8}}
+      sun_elevation_max: {kind: scalar, value: 1.54, tier: A, source_id: solar_geometry}
+      slope:  {kind: distribution, tier: B, source_id: dem_srtm,
+               quantiles: {0.01: 0.0, 0.5: 8.0, 0.99: 30.0}}
+      basaltic_volcanic_fraction: {kind: scalar, value: 0.6, tier: C, source_id: glim_lithology}
+    facts:
+      - id: moon_obliquity
+        text: "The Moon's obliquity to the ecliptic is about 1.5 degrees, so some polar crater floors stay in permanent shadow."
+        grade: verified
+        source_id: curated

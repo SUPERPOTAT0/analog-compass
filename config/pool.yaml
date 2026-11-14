@@ -1,0 +1,81 @@
+# Curated candidate sites. Coordinates are approximate, public-knowledge locations used to
+# place each site on the analysis grid. `known_analog: true` is used only for labelling and
+# for validating the system against expert expectations — NEVER to influence scoring or the
+# "new candidate" label (AGENTS.md rule 8).
+# Per-characteristic VALUES are NOT stored here; they come from the data bundle at these
+# coordinates (synthetic today, real on data day). Citations are marked for confirmation
+# rather than invented (AGENTS.md rule 1).
+version: "0.1.0"
+
+pool:
+  - site_id: atacama
+    label: "Atacama Desert, Chile"
+    lat: -24.5
+    lon: -69.25
+    known_analog: true
+    noted_for: [biology, operations]
+    logistics_access: road
+    citation: "Widely cited Mars aridity / life-detection analogue (confirm specific refs)."
+
+  - site_id: rio_tinto
+    label: "Río Tinto, Spain"
+    lat: 37.7
+    lon: -6.56
+    known_analog: true
+    noted_for: [lithology, biology]
+    logistics_access: road
+    citation: "Acid-rock-drainage Mars mineralogy/astrobiology analogue (confirm refs)."
+
+  - site_id: devon_island
+    label: "Devon Island (Haughton), Canada"
+    lat: 75.4
+    lon: -89.8
+    known_analog: true
+    noted_for: [operations, terrain]
+    logistics_access: airstrip
+    citation: "High-Arctic impact-structure Mars/Moon ops analogue (confirm refs)."
+
+  - site_id: holuhraun
+    label: "Holuhraun lava field, Iceland"
+    lat: 64.87
+    lon: -16.83
+    known_analog: true
+    noted_for: [lithology, caves]
+    logistics_access: track
+    citation: "Fresh basaltic lava field, lunar/Mars volcanic analogue (confirm refs)."
+
+  - site_id: mauna_loa
+    label: "Mauna Loa / Mauna Kea, Hawai'i"
+    lat: 19.6
+    lon: -155.5
+    known_analog: true
+    noted_for: [lithology, operations]
+    logistics_access: road
+    citation: "Basaltic volcanic terrain, lunar analogue (confirm refs)."
+
+  - site_id: dry_valleys
+    label: "McMurdo Dry Valleys, Antarctica"
+    lat: -77.5
+    lon: 162.0
+    known_analog: true
+    noted_for: [biology, thermal]
+    logistics_access: airstrip
+    citation: "Cold hyper-arid desert, life-limited analogue (confirm refs)."
+
+  - site_id: lava_beds
+    label: "Lava Beds, California, USA"
+    lat: 41.71
+    lon: -121.51
+    known_analog: true
+    noted_for: [caves, lithology]
+    logistics_access: road
+    citation: "Basaltic lava-tube cave system analogue (confirm refs)."
+
+  - site_id: danakil
+    label: "Danakil Depression, Ethiopia"
+    lat: 14.24
+    lon: 40.3
+    known_analog: true
+    noted_for: [biology, thermal]
+    logistics_access: track
+    citation: "Poly-extreme environment, extremophile analogue (confirm refs)."

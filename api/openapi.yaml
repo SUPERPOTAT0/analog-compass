@@ -1,0 +1,487 @@
+openapi: 3.1.0
+info:
+  title: Analog Compass API
+  version: 0.1.0
+  description: >
+    Test-led, evidence-based Earth-analogue finder for Moon/Mars field campaigns.
+    Stateless. Deterministic engine: identical request + data_version -> identical bytes.
+    Response bodies carry no timestamp (determinism). See docs/02_ARCHITECTURE.md.
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Liveness + data-mode probe
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+  /targets:
+    get:
+      operationId: listTargets
+      summary: List target environments
+      responses:
+        "200":
+          description: Targets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Target" }
+  /tests:
+    get:
+      operationId: listTests
+      summary: List test/operation templates
+      responses:
+        "200":
+          description: Tests
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Test" }
+  /sites:
+    get:
+      operationId: listSites
+      summary: List curated candidate sites
+      responses:
+        "200":
+          description: Sites
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Site" }
+  /compare:
+    post:
+      operationId: compare
+      summary: Rank candidate sites for a target x test
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompareRequest" }
+      responses:
+        "200":
+          description: Comparison result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompareResult" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+  /discover:
+    post:
+      operationId: discover
+      summary: Discover new candidate windows anywhere on Earth (Offline Candidate Screen)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DiscoverRequest" }
+      responses:
+        "200":
+          description: Discovery result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompareResult" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+  /suitability:
+    post:
+      operationId: suitability
+      summary: Which tests can a given site support, and why
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SuitabilityRequest" }
+      responses:
+        "200":
+          description: Suitability matrix for the site
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuitabilityResult" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+  /map.geojson:
+    post:
+      operationId: mapGeoJSON
+      summary: GeoJSON FeatureCollection for a compare/discover run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompareRequest" }
+      responses:
+        "200":
+          description: GeoJSON
+          content:
+            application/geo+json:
+              schema: { $ref: "#/components/schemas/FeatureCollection" }
+  /layers:
+    get:
+      operationId: listLayers
+      summary: Data catalog — characteristic layers, their sources and domains
+      responses:
+        "200":
+          description: Data layer catalog
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataCatalog" }
+  /data/contributions:
+    post:
+      operationId: submitDataContribution
+      summary: Propose a new dataset for review (data-growth intake)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DataContributionRequest" }
+      responses:
+        "200":
+          description: Contribution received for review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DataContributionResult" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+  /agent/chat:
+    post:
+      operationId: agentChat
+      summary: Grounded Geologist-Analysis agent (Server-Sent Events stream)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChatRequest" }
+      responses:
+        "200":
+          description: SSE stream of text deltas and tool-activity events
+          content:
+            text/event-stream:
+              schema: { type: string }
+        "503":
+          description: Agent not configured (missing ANTHROPIC_API_KEY)
+components:
+  responses:
+    ValidationError:
+      description: Request failed validation
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    Health:
+      type: object
+      required: [status, data_mode, data_version, engine_version]
+      properties:
+        status: { type: string, enum: [ok] }
+        data_mode: { type: string, enum: [synthetic, real] }
+        data_version: { type: string }
+        engine_version: { type: string }
+        agent_available: { type: boolean }
+    Target:
+      type: object
+      required: [target_id, body, label, characteristics]
+      properties:
+        target_id: { type: string }
+        body: { type: string, enum: [moon, mars] }
+        label: { type: string }
+        characteristics:
+          type: array
+          items: { type: string }
+        facts:
+          type: array
+          items: { $ref: "#/components/schemas/Fact" }
+    Fact:
+      type: object
+      required: [id, text, grade]
+      properties:
+        id: { type: string }
+        text: { type: string }
+        grade: { type: string, enum: [verified, cited, asserted, unknown] }
+        source_id: { type: string }
+    Test:
+      type: object
+      required: [test_id, label, domains, requirements]
+      properties:
+        test_id: { type: string }
+        label: { type: string }
+        rationale: { type: string }
+        domains:
+          type: array
+          items: { type: string }
+        requirements:
+          type: array
+          items: { $ref: "#/components/schemas/Requirement" }
+    Requirement:
+      type: object
+      required: [characteristic, role]
+      properties:
+        characteristic: { type: string }
+        role: { type: string, enum: [must, scored, setup] }
+        kind: { type: string, enum: [distribution, scalar, ordinal, envelope, threshold_min, threshold_max] }
+        weight: { type: number }
+        tau: { type: number }
+        rationale: { type: string }
+        evidence_floor: { type: string, enum: [A, B, C] }
+    Site:
+      type: object
+      required: [site_id, label, lat, lon, candidate_kind]
+      properties:
+        site_id: { type: string }
+        label: { type: string }
+        lat: { type: number }
+        lon: { type: number }
+        known_analog: { type: boolean }
+        candidate_kind: { type: string, enum: [curated, new] }
+        noted_for:
+          type: array
+          items: { type: string }
+    CompareRequest:
+      type: object
+      required: [target_id, test_id]
+      properties:
+        target_id: { type: string }
+        test_id: { type: string }
+        site_ids:
+          type: array
+          items: { type: string }
+          description: "Subset of curated sites; omit for all."
+        n_draws: { type: integer, minimum: 1 }
+    DiscoverRequest:
+      type: object
+      required: [target_id, test_id]
+      properties:
+        target_id: { type: string }
+        test_id: { type: string }
+        region_bbox:
+          type: array
+          items: { type: number }
+          minItems: 4
+          maxItems: 4
+          description: "[min_lon, min_lat, max_lon, max_lat]"
+        k: { type: integer, minimum: 1, default: 10 }
+        include_curated: { type: boolean, default: false }
+        n_draws: { type: integer, minimum: 1 }
+        constraints:
+          type: array
+          description: "Scientist filters; windows failing a required constraint are excluded."
+          items:
+            type: object
+            required: [characteristic, op, value]
+            properties:
+              characteristic: { type: string }
+              op: { type: string, enum: [min, max] }
+              value: { type: number }
+              required: { type: boolean, default: true }
+              weight: { type: number }
+    SuitabilityRequest:
+      type: object
+      required: [site_id]
+      properties:
+        site_id: { type: string }
+        target_id: { type: string, description: "Defaults to the body-appropriate target." }
+    CompareResult:
+      type: object
+      required: [run_id, seed, data_version, data_mode, engine_version, target_id, test_id, sites]
+      properties:
+        run_id: { type: string }
+        seed: { type: integer }
+        data_version: { type: string }
+        data_mode: { type: string, enum: [synthetic, real] }
+        engine_version: { type: string }
+        target_id: { type: string }
+        test_id: { type: string }
+        sites:
+          type: array
+          items: { $ref: "#/components/schemas/SiteResult" }
+    SiteResult:
+      type: object
+      required: [site_id, label, candidate_kind, verdict, p_gate, score, characteristics, honest_limits, coverage]
+      properties:
+        site_id: { type: string }
+        label: { type: string }
+        lat: { type: number }
+        lon: { type: number }
+        candidate_kind: { type: string, enum: [curated, new] }
+        verdict: { type: string, enum: [pass, borderline, excluded, blocked] }
+        p_gate: { type: number }
+        score: { type: number }
+        score_band:
+          type: array
+          items: { type: number }
+          minItems: 2
+          maxItems: 2
+        coverage: { type: number, description: "Fraction of intended weight actually scored." }
+        characteristics:
+          type: array
+          items: { $ref: "#/components/schemas/CharacteristicResult" }
+        honest_limits:
+          type: array
+          items: { type: string }
+        provenance: { $ref: "#/components/schemas/Provenance" }
+    CharacteristicResult:
+      type: object
+      required: [characteristic, status, tier]
+      properties:
+        characteristic: { type: string }
+        role: { type: string, enum: [must, scored, setup] }
+        status: { type: string, enum: [ok, missing, setup, proxy] }
+        match: { type: [number, "null"] }
+        tier: { type: string, enum: [A, B, C] }
+        source_id: { type: string }
+        contribution: { type: [number, "null"] }
+        gate_pass_rate: { type: [number, "null"] }
+        value_display: { type: [string, "null"] }
+    Provenance:
+      type: object
+      required: [origin]
+      properties:
+        origin: { type: string, enum: [curated, screen] }
+        screen_version: { type: string }
+        nominated_from:
+          type: array
+          items: { type: string }
+        window:
+          type: object
+          properties:
+            grid_id: { type: string }
+            bbox:
+              type: array
+              items: { type: number }
+        stage_scores:
+          type: object
+          additionalProperties: { type: number }
+        novelty:
+          type: object
+          properties:
+            pool_overlap: { type: boolean }
+            min_separation_km: { type: number }
+            cluster_id: { type: integer }
+        seed: { type: integer }
+    SuitabilityResult:
+      type: object
+      required: [site_id, target_id, tests]
+      properties:
+        site_id: { type: string }
+        target_id: { type: string }
+        tests:
+          type: array
+          items: { $ref: "#/components/schemas/SuitabilityEntry" }
+    SuitabilityEntry:
+      type: object
+      required: [test_id, label, verdict, reasons]
+      properties:
+        test_id: { type: string }
+        label: { type: string }
+        verdict: { type: string, enum: [pass, borderline, excluded, blocked] }
+        driving_characteristic: { type: [string, "null"] }
+        limiting_characteristic: { type: [string, "null"] }
+        reasons:
+          type: array
+          items: { type: string }
+    ChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          items:
+            type: object
+            required: [role, content]
+            properties:
+              role: { type: string, enum: [user, assistant] }
+              content: { type: string }
+    FeatureCollection:
+      type: object
+      required: [type, features]
+      properties:
+        type: { type: string, enum: [FeatureCollection] }
+        features:
+          type: array
+          items:
+            type: object
+            required: [type, geometry, properties]
+            properties:
+              type: { type: string, enum: [Feature] }
+              geometry:
+                type: object
+                properties:
+                  type: { type: string }
+                  coordinates: {}
+              properties:
+                type: object
+    DataCatalog:
+      type: object
+      required: [layers, sources]
+      properties:
+        data_mode: { type: string }
+        data_version: { type: string }
+        layers:
+          type: array
+          items: { $ref: "#/components/schemas/Layer" }
+        sources:
+          type: array
+          items: { $ref: "#/components/schemas/SourceLedger" }
+    Layer:
+      type: object
+      required: [id, kind, tier]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        unit: { type: [string, "null"] }
+        tier: { type: string, enum: [A, B, C] }
+        domain: { type: [string, "null"] }
+        proxy_for: { type: [string, "null"] }
+        description: { type: string }
+        source:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: [string, "null"] }
+            licence: { type: [string, "null"] }
+            resolution: { type: [string, "null"] }
+            provided_by: { type: [string, "null"] }
+            verified: {}
+    SourceLedger:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        group: { type: string }
+        name: { type: string }
+        description: { type: string }
+        licence: { type: [string, "null"] }
+        feeds:
+          type: array
+          items: { type: string }
+    DataContributionRequest:
+      type: object
+      required: [name, source_link, measures]
+      properties:
+        name: { type: string }
+        source_link: { type: string }
+        measures: { type: string }
+        characteristics:
+          type: array
+          items: { type: string }
+        coverage: { type: string }
+    DataContributionResult:
+      type: object
+      required: [ticket_id, status, checks]
+      properties:
+        ticket_id: { type: string }
+        status: { type: string, enum: [received, rejected] }
+        message: { type: string }
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              ok: { type: boolean }
+              note: { type: string }
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail: {}

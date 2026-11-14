@@ -1,0 +1,24 @@
+# Engine parameters. Tolerances here are defaults; a test template may override tau.
+version: "0.1.0"
+
+monte_carlo:
+  n_draws: 512               # overridable by ENGINE_N_DRAWS
+  draw_distribution: triangular   # bounded: nominal ∓ band, mode = nominal
+
+verdict:
+  pass_gate: 0.80            # fraction of draws passing ALL Must gates to allow a pass
+  pass_score: 0.60           # min weighted Scored match for a pass
+  exclude_gate: 0.20         # at/below this gate pass-rate -> excluded
+
+bands:
+  scale_warning_band_add: 0.10   # extra band when a characteristic carries a scale_warning
+
+seed:
+  salt: analog-compass       # overridable by ENGINE_SEED_SALT
+  engine_version: "0.1.0"
+
+# Default tolerances per characteristic kind (used when a template omits tau).
+default_tau:
+  distribution: 8.0
+  scalar: 0.25
+  ordinal: 1.0

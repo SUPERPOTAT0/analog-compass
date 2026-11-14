@@ -1,0 +1,129 @@
+# Data source registry. Every source_id referenced by config/characteristics.yaml and
+# by the knowledge base MUST appear here with a licence. "verified" = checked to exist
+# and be usable; unverified items are flagged and tracked in docs/QUESTIONS.md.
+#
+# Challenge-provided access portals (Earth Analog Finder, NASA Space Apps 2026): the brief
+# points to open PORTALS rather than one structured dataset — NASA Earthdata Search &
+# Worldview, NASA PDS, LRO (LROC/LOLA/Diviner/LEND/Mini-RF), ESA Copernicus/Sentinel &
+# Open Science, CSA RADARSAT/RCM SAR, JAXA G-Portal. Participants derive their own layers
+# from these (plus other open data). The entries below name the specific products we use
+# and the portal/agency each comes from. `provided_by` records the agency/portal.
+version: "0.2.0"
+
+sources:
+  - id: dem_srtm
+    name: "SRTM / Copernicus DEM (analysis DEM)"
+    licence: "public / open (confirm exact product on data day)"
+    resolution: "30 m"
+    used_for: [slope, roughness]
+    verified: partial            # product choice to confirm (OPEN)
+
+  - id: lst_climatology
+    name: "Land-surface temperature climatology"
+    licence: "to confirm"
+    resolution: "~1 km"
+    used_for: [temperature]
+    verified: partial            # OPEN-13
+
+  - id: lola_illum
+    name: "LOLA polar illumination (PGDA product 69)"
+    licence: "public (NASA PGDA)"
+    resolution: "240 m (18.6-yr average)"
+    used_for: [sunlit_fraction]
+    verified: true               # product verified; value semantics OPEN-08
+
+  - id: solar_geometry
+    name: "Analytic solar position (derived)"
+    licence: "n/a (computed)"
+    resolution: "derived"
+    used_for: [sun_elevation_max]
+    verified: true
+
+  - id: permafrost_pzi
+    name: "Global Permafrost Zonation Index (30 arc-seconds)"
+    licence: "research use (confirm)"
+    resolution: "30 arc-seconds"
+    used_for: [permafrost_index]
+    verified: true               # product verified; proxy meaning
+
+  - id: glim_lithology
+    name: "GLiM Global Lithological Map (16 first-level classes)"
+    licence: "CC BY 3.0"
+    resolution: "0.5 degree grid (PANGAEA) + vector original"
+    used_for: [basaltic_volcanic_fraction]
+    verified: true
+
+  - id: cave_catalog
+    name: "USGS Mars Global Cave Candidate Catalog (+ curated literature)"
+    licence: "public domain (USGS)"
+    resolution: "catalogue"
+    used_for: [cave_evidence]
+    verified: partial            # Mars verified; Moon pit catalogue OPEN-10
+
+  - id: merra2_aerosol
+    name: "MERRA-2 aerosol diagnostics"
+    licence: "NASA open"
+    resolution: "0.5 x 0.625 degree, monthly"
+    used_for: [dust_aerosol_load]
+    verified: partial            # variable names OPEN-07
+
+  - id: merra2_wind
+    name: "MERRA-2 single-level wind"
+    licence: "NASA open"
+    resolution: "0.5 x 0.625 degree"
+    used_for: [wind_speed_mean]
+    verified: partial            # variable names OPEN-07
+
+  - id: modis_vcf
+    name: "MODIS Vegetation Continuous Fields (MOD44B)"
+    licence: "no use restrictions"
+    resolution: "250 m, yearly"
+    used_for: [vegetation_cover]
+    verified: true
+
+  - id: travel_time
+    name: "Global travel-time-to-cities (2015)"
+    licence: "open (confirm)"
+    resolution: "1 km, 85N-60S"
+    used_for: [remoteness_time]
+    verified: true
+
+  - id: curated
+    name: "Curated from literature (with citations in config/pool.yaml)"
+    licence: "see citations"
+    resolution: "n/a"
+    used_for: [logistics_access, cave_evidence]
+    verified: partial
+
+  # --- challenge-provided lunar/Mars + Earth portals -----------------------------
+  - id: diviner_temp
+    name: "LRO Diviner lunar surface temperatures (PDS Geosciences)"
+    licence: "public (NASA PDS)"
+    resolution: "varies; polar products emphasised"
+    provided_by: "NASA LRO / PDS (challenge-provided)"
+    used_for: [temperature]          # Moon-side temperature target
+    verified: true
+
+  - id: sentinel_copernicus
+    name: "ESA Copernicus Sentinel (SAR + optical, land/atmosphere)"
+    licence: "free and open (Copernicus)"
+    resolution: "10-60 m (product dependent)"
+    provided_by: "ESA Copernicus Data Space (challenge-provided)"
+    used_for: []                     # available for future lithology/terrain/aeolian layers
+    verified: true
+
+  - id: radarsat_sar
+    name: "CSA RADARSAT-1 / RCM Synthetic Aperture Radar"
+    licence: "open (RADARSAT-1 archive)"
+    resolution: "SAR, mode dependent"
+    provided_by: "CSA (challenge-provided)"
+    used_for: []                     # available for roughness/surface/ice layers
+    verified: true
+
+  - id: nasa_portals
+    name: "NASA Earthdata Search / Worldview / PDS (discovery portals)"
+    licence: "open (NASA)"
+    resolution: "portal"
+    provided_by: "NASA (challenge-provided)"
+    used_for: []
+    verified: true

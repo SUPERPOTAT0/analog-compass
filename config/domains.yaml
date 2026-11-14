@@ -1,0 +1,45 @@
+# Challenge-domain -> characteristics map. Cross-checked by scripts/check_config_crossrefs.py.
+# status: covered | proxy | partial | not_covered. See docs/13_CHALLENGE_ALIGNMENT.md.
+version: "0.1.0"
+
+domains:
+  - id: terrain
+    label: "Terrain / morphology"
+    characteristics: [slope, roughness]
+    status: covered
+  - id: thermal
+    label: "Thermal"
+    characteristics: [temperature, sun_elevation_max]
+    status: covered
+  - id: illumination
+    label: "Illumination"
+    characteristics: [sunlit_fraction, sun_elevation_max]
+    status: covered
+  - id: lithology
+    label: "Lithology"
+    characteristics: [basaltic_volcanic_fraction]
+    status: proxy
+  - id: caves
+    label: "Caves / lava tubes"
+    characteristics: [cave_evidence, basaltic_volcanic_fraction]
+    status: partial
+  - id: operations
+    label: "Remoteness / operations"
+    characteristics: [remoteness_time]
+    status: covered
+  - id: biology
+    label: "Biology / habitability"
+    characteristics: [vegetation_cover]
+    status: proxy
+  - id: dust_wind
+    label: "Dust & wind"
+    characteristics: [dust_aerosol_load, wind_speed_mean]
+    status: partial
+  - id: subsurface
+    label: "Subsurface"
+    characteristics: []
+    status: not_covered
+  - id: earth_processes
+    label: "Earth processes"
+    characteristics: []
+    status: not_covered

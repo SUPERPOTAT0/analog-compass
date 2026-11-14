@@ -1,0 +1,102 @@
+# Characteristic registry. Every characteristic referenced by a target, test, or source
+# MUST appear here. `kind` selects the match function (docs/03_ENGINE_SPEC.md §5).
+# tier: A=measured, B=derived, C=proxy. A proxy (C) can never satisfy a Must gate alone.
+version: "0.1.0"
+
+characteristics:
+  - id: slope
+    kind: distribution
+    unit: degree
+    tier: B
+    source_id: dem_srtm
+    description: "Terrain slope distribution on the 30 m analysis grid."
+
+  - id: roughness
+    kind: distribution
+    unit: meter
+    tier: B
+    source_id: dem_srtm
+    description: "Local topographic roughness (std of residual relief)."
+
+  - id: temperature
+    kind: envelope
+    unit: celsius
+    tier: B
+    source_id: lst_climatology
+    description: "Surface temperature; matched as range overlap (envelope)."
+
+  - id: sunlit_fraction
+    kind: distribution
+    unit: fraction
+    tier: B
+    source_id: lola_illum
+    description: "Fraction of time sunlit, per month (Moon polar analogue)."
+
+  - id: sun_elevation_max
+    kind: scalar
+    unit: degree
+    tier: B
+    source_id: solar_geometry
+    description: "Maximum solar elevation over the window in the date range."
+
+  - id: permafrost_index
+    kind: scalar
+    unit: index_0_1
+    tier: C                       # PROXY for ground ice
+    source_id: permafrost_pzi
+    proxy_for: "ground ice / icy regolith"
+    description: "Permafrost Zonation Index; proxy only, caps verdict at borderline."
+
+  - id: basaltic_volcanic_fraction
+    kind: scalar
+    unit: fraction
+    tier: C                       # PROXY for lava-tube terrain
+    source_id: glim_lithology
+    proxy_for: "lava-tube-forming terrain"
+    description: "Fraction of window in the basic-volcanic lithology class."
+
+  - id: cave_evidence
+    kind: ordinal
+    unit: class
+    tier: C
+    source_id: cave_catalog
+    scale: [none, inferred, candidate, confirmed]   # OPEN-12: placeholder scale
+    description: "Ordinal evidence of caves/pits/lava tubes."
+
+  - id: dust_aerosol_load
+    kind: scalar
+    unit: optical_depth
+    tier: B
+    source_id: merra2_aerosol
+    description: "Aerosol optical depth (model, coarse). Earth AOD != Mars opacity (OPEN-09)."
+
+  - id: wind_speed_mean
+    kind: scalar
+    unit: meter_per_second
+    tier: B
+    source_id: merra2_wind
+    description: "Mean near-surface wind speed (model, coarse)."
+
+  - id: vegetation_cover
+    kind: scalar
+    unit: percent
+    tier: C                       # PROXY for life-limited conditions
+    source_id: modis_vcf
+    proxy_for: "life-limited surface conditions"
+    description: "MODIS Vegetation Continuous Fields; proxy, not a habitability measure."
+
+  - id: remoteness_time
+    kind: scalar
+    unit: minute
+    tier: B
+    source_id: travel_time
+    coverage_bbox: [-180, -60, 180, 85]   # outside -> missing (outside_coverage)
+    description: "Travel time to the nearest city (isolation proxy for ops)."
+
+  # --- setup controls: never scored (docs/03_ENGINE_SPEC.md §2) ---
+  - id: logistics_access
+    kind: setup
+    unit: category
+    tier: B
+    source_id: curated
+    description: "Field access (road/airstrip). Context only; never scored."

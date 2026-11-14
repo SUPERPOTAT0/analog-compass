@@ -1,0 +1,115 @@
+# Test / operation requirement templates. These drive BOTH compare and the suitability
+# matrix (docs/06_SUITABILITY_SPEC.md). role: must (gated + scored) | scored | setup.
+# For threshold_min/max kinds the gate is the requirement (x >= value, or x <= value).
+# For distribution/scalar/envelope kinds a Must carries an explicit `gate`.
+# A requirement with evidence_floor: C allows a proxy but caps the verdict at borderline.
+version: "0.1.0"
+
+tests:
+  - test_id: rover_traverse_autonomy
+    label: "Rover traverse autonomy trial"
+    domains: [terrain, operations]
+    rationale: "Autonomy software must handle representative slope/roughness over long isolated traverses."
+    actionable: "Run autonomous navigation and hazard-avoidance traverses over rough, GPS-denied terrain."
+    base_relevance: "Validated mobility and autonomy reduce the risk of stranding crewed or robotic assets, and inform rover siting, traverse planning and the comms cadence a Moon/Mars base needs for surface logistics."
+    requirements:
+      - {characteristic: slope, role: must, kind: distribution, weight: 0.4, tau: 5,
+         gate: {stat: p50, max: 15}, rationale: "Traverse safety degrades on steep median slopes."}
+      - {characteristic: roughness, role: scored, kind: distribution, weight: 0.3, tau: 3,
+         rationale: "Rock abundance / roughness stresses path planning."}
+      - {characteristic: remoteness_time, role: scored, kind: threshold_min, weight: 0.3,
+         requirement: {value: 120, tau: 120}, rationale: "Isolation mimics comms-limited ops."}
+
+  - test_id: cryo_drill_trial
+    label: "Cryogenic / permafrost drilling trial"
+    domains: [subsurface, thermal, operations]
+    rationale: "Validates a percussive/cryo drill in frozen ground analogous to icy regolith."
+    actionable: "Trial percussive/cryo drilling and core recovery in frozen, ice-bearing ground."
+    base_relevance: "Subsurface ice is the keystone resource for a sustained base (water, oxygen, propellant). Drilling trials in terrestrial permafrost de-risk ISRU water extraction and ground-ice prospecting for life support and fuel production."
+    requirements:
+      - {characteristic: permafrost_index, role: must, kind: threshold_min, weight: 0.4,
+         requirement: {value: 0.5, tau: 0.2}, evidence_floor: C,
+         rationale: "Needs frozen ground; permafrost is a PROXY for icy regolith (provisional)."}
+      - {characteristic: slope, role: must, kind: distribution, weight: 0.2, tau: 5,
+         gate: {stat: p50, max: 15}, rationale: "Drill rig stability needs gentle ground."}
+      - {characteristic: temperature, role: scored, kind: envelope, weight: 0.2,
+         rationale: "Cold thermal regime relevant to cryo hardware."}
+      - {characteristic: remoteness_time, role: scored, kind: threshold_min, weight: 0.2,
+         requirement: {value: 120, tau: 120}, rationale: "Logistics isolation."}
+
+  - test_id: life_detection_assay
+    label: "Life-detection instrument validation"
+    domains: [biology, thermal, operations]
+    rationale: "Tests a life-detection assay in a life-limited environment with low organic background."
+    actionable: "Validate life-detection assays and contamination control in a low-biomass, oxidant-rich setting."
+    base_relevance: "Clean biosignature detection and planetary-protection protocols protect both crew health and the scientific integrity of a base's astrobiology program, and guide where samples can be stored or processed without contamination."
+    requirements:
+      - {characteristic: vegetation_cover, role: must, kind: threshold_max, weight: 0.4,
+         requirement: {value: 5, tau: 10}, evidence_floor: C,
+         rationale: "Low vegetation is a PROXY for life-limited surface conditions (provisional)."}
+      - {characteristic: remoteness_time, role: must, kind: threshold_min, weight: 0.2,
+         requirement: {value: 180, tau: 120}, rationale: "Contamination control favours isolation."}
+      - {characteristic: temperature, role: scored, kind: envelope, weight: 0.2,
+         rationale: "Thermal regime affects biosignature preservation."}
+      - {characteristic: dust_aerosol_load, role: scored, kind: scalar, weight: 0.2, tau: 0.3,
+         rationale: "Aeolian setting relevant to sample handling."}
+
+  - test_id: lava_tube_exploration
+    label: "Lava-tube / cave exploration"
+    domains: [caves, lithology, terrain]
+    rationale: "Rehearses robotic/human cave exploration in lava-tube terrain."
+    actionable: "Rehearse robotic/human cave mapping, comms relay and ingress in basaltic lava tubes."
+    base_relevance: "Lava tubes are leading candidates for shielded habitats: they offer natural protection from radiation, micrometeorites and thermal swings, so exploration tests directly inform base siting and habitat shielding strategy."
+    requirements:
+      - {characteristic: basaltic_volcanic_fraction, role: must, kind: threshold_min, weight: 0.4,
+         requirement: {value: 0.3, tau: 0.2}, evidence_floor: C,
+         rationale: "Basalt is necessary (PROXY) for lava-tube formation, not proof one exists."}
+      - {characteristic: cave_evidence, role: scored, kind: ordinal, weight: 0.4, tau: 1,
+         rationale: "Direct evidence of caves/pits raises suitability."}
+      - {characteristic: slope, role: scored, kind: distribution, weight: 0.2, tau: 6,
+         rationale: "Approach terrain."}
+
+  - test_id: thermal_cycling_hardware
+    label: "Thermal-cycling hardware exposure"
+    domains: [thermal, illumination]
+    rationale: "Exposes hardware to a representative diurnal/seasonal thermal envelope."
+    actionable: "Expose hardware, seals and deployables to a representative diurnal/seasonal thermal range."
+    base_relevance: "Extreme thermal cycling drives failures in power, mechanisms and structures. Field thermal testing informs thermal-control design, material selection and the duty cycles a base's systems must survive."
+    requirements:
+      - {characteristic: temperature, role: must, kind: envelope, weight: 0.6,
+         gate: {stat: overlap, min: 0.4}, rationale: "Site must span enough of the target range."}
+      - {characteristic: sun_elevation_max, role: scored, kind: scalar, weight: 0.2, tau: 10,
+         rationale: "Low-sun geometry drives thermal extremes."}
+      - {characteristic: slope, role: scored, kind: distribution, weight: 0.2, tau: 8,
+         rationale: "Aspect/slope shapes insolation."}
+
+  - test_id: eva_procedure_rehearsal
+    label: "EVA / crew procedure rehearsal"
+    domains: [operations, terrain]
+    rationale: "Rehearses crew EVA procedures on representative, accessible terrain."
+    actionable: "Rehearse crew EVA procedures, tool use and mobility on representative, accessible terrain."
+    base_relevance: "EVA efficiency and safety govern how much surface work a crew can do. Procedure rehearsals shape suit ergonomics, task timelines and the surface infrastructure a base must provide."
+    requirements:
+      - {characteristic: slope, role: must, kind: distribution, weight: 0.5, tau: 6,
+         gate: {stat: p50, max: 20}, rationale: "Crew mobility and safety."}
+      - {characteristic: roughness, role: scored, kind: distribution, weight: 0.3, tau: 3,
+         rationale: "Footing and tool use."}
+      - {characteristic: remoteness_time, role: scored, kind: threshold_min, weight: 0.2,
+         requirement: {value: 60, tau: 120}, rationale: "Operational realism."}
+      - {characteristic: logistics_access, role: setup,
+         rationale: "Field access (context only; never scored)."}
+
+  - test_id: isru_regolith_processing
+    label: "ISRU regolith-processing trial"
+    domains: [lithology, operations]
+    rationale: "Feeds basaltic regolith to an in-situ resource-utilisation processor."
+    actionable: "Feed basaltic regolith to an ISRU processor to test excavation, handling and material yield."
+    base_relevance: "Turning local regolith into oxygen, metals and construction feedstock is what makes a base self-sufficient. Processing trials inform ISRU plant design, excavation robotics and in-situ construction such as sintered-regolith structures."
+    requirements:
+      - {characteristic: basaltic_volcanic_fraction, role: must, kind: threshold_min, weight: 0.5,
+         requirement: {value: 0.3, tau: 0.2}, evidence_floor: C,
+         rationale: "Needs basaltic feedstock (PROXY for mare-like regolith)."}
+      - {characteristic: slope, role: scored, kind: distribution, weight: 0.3, tau: 6,
+         rationale: "Plant siting."}
+      - {characteristic: remoteness_time, role: scored, kind: threshold_min, weight: 0.2,
+         requirement: {value: 60, tau: 120}, rationale: "Logistics."}
