@@ -31,3 +31,4 @@ data/real/
 
 # OS
 .DS_Store
+.vercel
