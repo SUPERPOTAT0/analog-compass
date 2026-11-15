@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "cd \"Build Analog Compass Website\" && npm ci",
+  "buildCommand": "cd \"Build Analog Compass Website\" && VITE_API_URL=/api npm run build",
+  "outputDirectory": "Build Analog Compass Website/dist",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{src,config,data}/**",
+      "maxDuration": 300
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" }
+  ]
+}

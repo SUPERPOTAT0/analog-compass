@@ -1,0 +1,12 @@
+.venv
+.mypy_cache
+.pytest_cache
+.ruff_cache
+**/node_modules
+**/__pycache__
+Build Analog Compass Website/dist
+frontend
+docs
+tests
+reports
+.env
